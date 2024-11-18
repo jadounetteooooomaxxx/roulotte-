@@ -1,76 +1,70 @@
-const themes = ["pailette", "bunny", "blonde", "guerriere", "gatsby", "coquette", "masque", "rouge"];
-const spinButton = document.getElementById('spin-button');
-const resultDiv = document.getElementById('result');
-const themeResult = document.getElementById('theme-result');
-const message = document.getElementById('message');
 const canvas = document.getElementById('roulette-wheel');
 const ctx = canvas.getContext('2d');
-
-const wheelRadius = canvas.width / 2;
-const segmentAngle = Math.PI * 2 / themes.length;
-let chosenTheme = null; // Variable pour stocker le thème attribué
+const spinButton = document.getElementById('spin-button');
+const themes = ["pailette", "bunny", "blonde", "guerriere", "gatsby", "coquette", "masque", "rouge"];
+let rotationAngle = 0;
+let themeAttribué = false; // Variable pour vérifier si un thème a été attribué
 
 // Fonction pour dessiner la roue
 function drawWheel(rotationAngle) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.translate(wheelRadius, wheelRadius); // Déplacer le centre de la roue
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Effacer la roue précédente
+    ctx.translate(canvas.width / 2, canvas.height / 2); // Déplacer le centre de la roue
 
-    // Dessiner chaque segment avec un angle et une couleur
+    const segmentAngle = Math.PI * 2 / themes.length;
+
+    // Dessiner chaque segment de la roue
     themes.forEach((theme, i) => {
         const startAngle = i * segmentAngle;
         const endAngle = (i + 1) * segmentAngle;
+
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        ctx.arc(0, 0, wheelRadius, startAngle, endAngle);
-        ctx.fillStyle = i % 2 === 0 ? '#f39c12' : '#e74c3c'; // Couleurs alternées
+        ctx.arc(0, 0, canvas.width / 2, startAngle, endAngle);
+        ctx.fillStyle = i % 2 === 0 ? '#f39c12' : '#e74c3c'; // Alternance des couleurs
         ctx.fill();
 
-        // Ajouter le texte du thème au centre de chaque segment
         ctx.save();
         ctx.rotate((startAngle + endAngle) / 2); // Centrer le texte
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 20px Arial';
-        ctx.fillText(theme, wheelRadius / 2, 10);
+        ctx.fillText(theme, canvas.width / 4, 10);
         ctx.restore();
     }
 
     ctx.rotate(rotationAngle); // Tourner la roue pour l'animation
-    ctx.resetTransform(); // Réinitialiser la transformation pour la prochaine itération
+    ctx.resetTransform(); // Réinitialiser la transformation
 }
 
 // Fonction pour faire tourner la roue
 function spinWheel() {
-    let rotationAngle = 0;
-    const rotationSpeed = 0.05; // La vitesse de la rotation
-    const maxRotation = Math.PI * 10; // Combien de tours la roue doit faire avant de s'arrêter
-
-    function rotate() {
-        if (rotationAngle < maxRotation) {
-            rotationAngle += rotationSpeed;
-            drawWheel(rotationAngle);
-            requestAnimationFrame(rotate);
+    let rotateInterval = setInterval(() => {
+        if (rotationAngle < Math.PI * 5) { // Limite de 5 tours avant de s'arrêter
+            rotationAngle += 0.1; // Vitesse de la rotation
+            drawWheel(rotationAngle); // Redessiner la roue
         } else {
-            stopWheel(rotationAngle); // Quand la roue est arrêtée, on appelle la fonction pour choisir un thème
+            clearInterval(rotateInterval); // Arrêter la rotation
+            displayTheme(rotationAngle); // Afficher le thème après la rotation
         }
-    }
-
-    rotate();
+    }, 30);
 }
 
-// Fonction pour arrêter la roue et choisir un thème
-function stopWheel(rotationAngle) {
+// Fonction pour afficher le thème
+function displayTheme(rotationAngle) {
     const stopAngle = rotationAngle % (Math.PI * 2);
     const index = Math.floor((stopAngle / (Math.PI * 2)) * themes.length);
-    chosenTheme = themes[index];
-
-    // Afficher le résultat
-    themeResult.textContent = chosenTheme;
-    resultDiv.style.display = "block";
+    const chosenTheme = themes[index];
+    
+    // Afficher le message avec le thème attribué
+    document.getElementById('result').textContent = "Ton thème est : " + chosenTheme;
+    document.getElementById('result').style.display = "block";
+    themeAttribué = true; // Empêcher un autre tirage
 }
 
-// Ajouter l'événement au bouton pour commencer la rotation
+// Event Listener pour le bouton "Start"
 spinButton.addEventListener('click', () => {
-    if (!chosenTheme) { // Si aucun thème n'a été attribué
-        spinWheel();
+    if (!themeAttribué) {
+        themeAttribué = true; // Marquer que le thème a été attribué
+        spinWheel(); // Démarrer la roue
     }
 });
+
