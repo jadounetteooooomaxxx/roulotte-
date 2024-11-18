@@ -4,18 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roulette Thématique</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #roulette-wheel {
+            margin-top: 50px;
+        }
+        #result {
+            font-size: 24px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <div id="roulette-container">
-        <canvas id="roulette-wheel" width="500" height="500"></canvas>
-        <button id="spin-button">Start</button>
-    </div>
-    <div id="result" style="display: none;">
-        <h2>Tu as obtenu le thème :</h2>
-        <p id="theme-result"></p>
-        <p id="message" style="font-size: 18px; font-weight: bold;">Trop hâte de voir ton costume !</p>
-    </div>
+
+    <h1>Roulette Thématique</h1>
+    <canvas id="roulette-wheel" width="500" height="500"></canvas>
+    <br>
+    <button id="spin-button">Start</button>
+    <div id="result"></div>
+
     <script src="script.js"></script>
 </body>
 </html>
